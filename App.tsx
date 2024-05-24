@@ -17,7 +17,7 @@ const App = () => {
 
 <>
 <HomePage component={HomePage} />
-<MovieDetailsPage component={MovieDetailsPage} />
+{/* <MovieDetailsPage component={MovieDetailsPage} /> */}
 </>
 
 

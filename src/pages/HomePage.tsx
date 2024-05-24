@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import MovieDetailsPage from './MovieDetailsPage'; // Import the MovieDetailsPage
 
 const HomePage: React.FC = () => {
-  const [movies, setMovies] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-
+  const [selectedGenre, setSelectedGenre] = useState<string>('All');
 
   return (
     <View style={styles.container}>
@@ -15,56 +13,52 @@ const HomePage: React.FC = () => {
       </View>
 
       {/* Tab bar */}
-      <ScrollView horizontal={true} style={{ backgroundColor: '#333' }}>
-        <View style={{ height: 50, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => console.log("All clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white',width:40,backgroundColor:'#222',padding:10,borderRadius:5}}>All</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Action clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white' }}>Action</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Comedy clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white' }}>Comedy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Horror clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white' }}>Horror</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Drama clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white' }}>Drama</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Sci-Fi clicked")} style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: 'white' }}>Sci-Fi</Text>
-          </TouchableOpacity>
+      <ScrollView horizontal={true} style={styles.tabBar}>
+        <View style={styles.tabBarContent}>
+          {['All', 'Action', 'Comedy', 'Horror', 'Drama', 'Sci-Fi'].map((genre) => (
+            <TouchableOpacity
+              key={genre}
+              onPress={() => setSelectedGenre(genre)}
+              style={[styles.tab, selectedGenre === genre && styles.activeTab]}
+            >
+              <Text style={[styles.tabText, selectedGenre === genre && styles.activeTabText]}>
+                {genre}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
 
-     
-
-
+      {/* Movie Details Page */}
+      <MovieDetailsPage genre={selectedGenre} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-  
+    flex: 1,
     backgroundColor: '#fff',
   },
   header: {
     height: 60,
     backgroundColor: '#333',
-    
     justifyContent: 'center',
   },
   headerText: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'red',
-    marginLeft:20,
+    marginLeft: 30,
   },
   tabBar: {
     backgroundColor: '#333',
-    marginBottom:20 ,
+  },
+  tabBarContent: {
+    height: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   tab: {
     paddingHorizontal: 20,
@@ -72,19 +66,13 @@ const styles = StyleSheet.create({
   tabText: {
     color: 'white',
   },
-  content: {
-    
-    padding: 20,
+  activeTab: {
+    backgroundColor: '#222',
+    borderRadius: 5,
   },
-  movieContainer: {
-    marginBottom: 20,
-  },
-  movieTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  movieOverview: {
-    fontSize: 16,
+  activeTabText: {
+    color: 'white',
+    padding: 10,
   },
 });
 

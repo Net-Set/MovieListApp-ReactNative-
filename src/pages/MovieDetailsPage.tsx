@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, useColorScheme } from 'react-native';
 
-const MovieDetailsPage = () => {
+const MovieDetailsPage = ({ genre }) => {
   const [loading, setLoading] = useState(true);
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
@@ -9,15 +9,26 @@ const MovieDetailsPage = () => {
   const colorScheme = useColorScheme(); // Get the current color scheme
 
   useEffect(() => {
-    fetchMovies();
+    setMovies([]);
+    setPage(1);
+    fetchMovies(1, genre);
+  }, [genre]);
+
+  useEffect(() => {
+    if (page > 1) fetchMovies(page, genre);
   }, [page]);
 
-  const fetchMovies = () => {
+  const fetchMovies = (page, genre) => {
     setLoading(true);
-    fetch(`https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&sort_by=popularity.desc&primary_release_year=2023&page=${page}&vote_count.gte=100`)
+    const endpoint =
+      genre === 'All'
+        ? `https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&sort_by=popularity.desc&primary_release_year=2023&page=${page}&vote_count.gte=100`
+        : `https://api.themoviedb.org/3/search/movie?api_key=2dca580c2a14b55200e784d157207b4d&query=${genre}&page=${page}`;
+
+    fetch(endpoint)
       .then((response) => response.json())
       .then((data) => {
-        setMovies(prevMovies => [...prevMovies, ...data.results]);
+        setMovies((prevMovies) => (page === 1 ? data.results : [...prevMovies, ...data.results]));
         setLoading(false);
         setIsFetchingMore(false);
       })
@@ -31,7 +42,7 @@ const MovieDetailsPage = () => {
   const handleLoadMore = () => {
     if (!isFetchingMore) {
       setIsFetchingMore(true);
-      setPage(prevPage => prevPage + 1);
+      setPage((prevPage) => prevPage + 1);
     }
   };
 
@@ -42,7 +53,7 @@ const MovieDetailsPage = () => {
         style={styles.movieImage}
       />
       <Text style={[styles.movieTitle, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>{item.title}</Text>
-      <Text style={[styles.movieOverview, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]} numberOfLines={3}>{item.overview}</Text>
+      <Text style={[styles.movieRating, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]}>Rating: {item.vote_average}</Text>
     </View>
   );
 
@@ -68,7 +79,7 @@ const MovieDetailsPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 100,
     padding: 20,
   },
   content: {
@@ -77,30 +88,31 @@ const styles = StyleSheet.create({
   movieContainer: {
     flex: 1,
     margin: 10,
-    backgroundColor: '#333',
+    backgroundColor: '#33333399',
     borderRadius: 10,
     overflow: 'hidden',
-    shadowColor: '#333',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    alignItems: 'center',
+      marginLeft:10,
   },
   movieImage: {
     width: '100%',
     height: 200,
   },
   movieTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    margin: 10,
-    textAlign: 'center',
-  },
-  movieOverview: {
     fontSize: 14,
-    margin: 10,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginVertical: 10,
+    textAlign: 'left',
+    marginLeft:10,
+  },
+  movieRating: {
+    fontSize: 10,
+    marginBottom: 10,
+    textAlign: 'left',
+    marginLeft:10,
   },
 });
 
