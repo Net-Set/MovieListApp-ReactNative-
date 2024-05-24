@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomePage from './src/pages/HomePage';
-// import MovieDetailsPage from './src/pages/MovieDetailsPage';
+import MovieDetailsPage from './src/pages/MovieDetailsPage';
 
 const Stack = createStackNavigator();
 
@@ -14,9 +14,13 @@ const App = () => {
     //     {/* <Stack.Screen name="MovieDetails" component={MovieDetailsPage} /> */}
     //   </Stack.Navigator>
     // </NavigationContainer>
-    <>
-      <HomePage component={HomePage} />
-    </>
+
+<>
+<HomePage component={HomePage} />
+<MovieDetailsPage component={MovieDetailsPage} />
+</>
+
+
   );
 };
 

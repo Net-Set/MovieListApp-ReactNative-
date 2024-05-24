@@ -1,14 +1,19 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Button } from "@material-tailwind/react";
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
+  const [movies, setMovies] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+
+
   return (
-    <View style={{ }}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={{ height: 60, backgroundColor: '#333', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
-        <Text style={{ fontSize: 20,marginLeft:10,fontWeight:'bold', color: 'red' }}>MOVIEFIX</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>MOVIEFIX</Text>
       </View>
+
       {/* Tab bar */}
       <ScrollView horizontal={true} style={{ backgroundColor: '#333' }}>
         <View style={{ height: 50, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
@@ -32,17 +37,55 @@ const HomePage = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      {/* Content area */}
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ padding: 20 }}>
-          <Text style={{ fontSize: 18 }}>2012</Text>
-          <Text style={{ fontSize: 16 }}>Title</Text>
-          <Text style={{ fontSize: 16 }}>Title</Text>
-          {/* Add more content here */}
-        </View>
-      </ScrollView>
+
+     
+
+
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+  
+    backgroundColor: '#fff',
+  },
+  header: {
+    height: 60,
+    backgroundColor: '#333',
+    
+    justifyContent: 'center',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'red',
+    marginLeft:20,
+  },
+  tabBar: {
+    backgroundColor: '#333',
+    marginBottom:20 ,
+  },
+  tab: {
+    paddingHorizontal: 20,
+  },
+  tabText: {
+    color: 'white',
+  },
+  content: {
+    
+    padding: 20,
+  },
+  movieContainer: {
+    marginBottom: 20,
+  },
+  movieTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  movieOverview: {
+    fontSize: 16,
+  },
+});
 
 export default HomePage;
