@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, useColorScheme, TouchableOpacity } from 'react-native';
 import { BackHandler } from 'react-native';
 import { Linking } from 'react-native';
+import { API_KEY } from '@env';
 
 const MovieDetailsPage = ({ genre }) => {
   const [loading, setLoading] = useState(true);
@@ -32,8 +33,8 @@ const MovieDetailsPage = ({ genre }) => {
     setLoading(true);
     const endpoint =
       genre === 'All'
-        ? `https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&sort_by=popularity.desc&page=${page}&vote_count.gte=100`
-        : `https://api.themoviedb.org/3/search/movie?api_key=2dca580c2a14b55200e784d157207b4d&query=${genre}&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&page=${page}`;
+        ? `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&sort_by=popularity.desc&page=${page}&vote_count.gte=100`
+        : `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${genre}&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&page=${page}`;
 
     fetch(endpoint)
       .then((response) => response.json())
@@ -76,7 +77,7 @@ const MovieDetailsPage = ({ genre }) => {
   };
 
   const fetchMovieDetails = (movieId) => {
-    const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?api_key=2dca580c2a14b55200e784d157207b4d`;
+    const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`;
 
     fetch(endpoint)
       .then((response) => response.json())
@@ -145,13 +146,14 @@ const MovieDetailsPage = ({ genre }) => {
       )}
     </View>
   );
+
   return (
     <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#121212' : '#f4f4f4' }]}>
-   <TouchableOpacity style={styles.yearButton} onPress={() => alert('Year button pressed')}>
-  <Text style={[styles.yearText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
-    {year}
-  </Text>
-</TouchableOpacity>
+      <TouchableOpacity style={styles.yearButton} onPress={() => alert('Year button pressed')}>
+        <Text style={[styles.yearText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+          {year}
+        </Text>
+      </TouchableOpacity>
 
       {loading && page === 1 ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -180,7 +182,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   yearButton: {
-    
     borderRadius: 5,
     alignItems: 'center', // Center the text vertically
     justifyContent: 'center', // Center the text horizontally
