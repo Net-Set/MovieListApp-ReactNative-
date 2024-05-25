@@ -10,24 +10,25 @@ const MovieDetailsPage = ({ genre }) => {
   const [page, setPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [movieDetails, setMovieDetails] = useState(null);
+  const [year, setYear] = useState(2012); // Default year
   const colorScheme = useColorScheme();
 
   useEffect(() => {
     setMovies([]);
     setPage(1);
-    fetchMovies(1, genre);
-  }, [genre]);
+    fetchMovies(year, 1, genre);
+  }, [genre, year]);
 
   useEffect(() => {
-    if (page > 1) fetchMovies(page, genre);
+    if (page > 1) fetchMovies(year, page, genre);
   }, [page]);
 
-  const fetchMovies = (page, genre) => {
+  const fetchMovies = (year, page, genre) => {
     setLoading(true);
     const endpoint =
       genre === 'All'
-        ? `https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&sort_by=popularity.desc&primary_release_year=2023&page=${page}&vote_count.gte=100`
-        : `https://api.themoviedb.org/3/search/movie?api_key=2dca580c2a14b55200e784d157207b4d&query=${genre}&page=${page}`;
+        ? `https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&sort_by=popularity.desc&page=${page}&vote_count.gte=100`
+        : `https://api.themoviedb.org/3/search/movie?api_key=2dca580c2a14b55200e784d157207b4d&query=${genre}&primary_release_date.gte=${year}-01-01&primary_release_date.lte=${year}-12-31&page=${page}`;
 
     fetch(endpoint)
       .then((response) => response.json())
@@ -42,25 +43,20 @@ const MovieDetailsPage = ({ genre }) => {
         setIsFetchingMore(false);
       });
   };
-  useEffect(() => {
-    // Add event listener for back button press
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBack);
 
-    // Remove event listener when component unmounts
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBack);
     return () => backHandler.remove();
-  }, [selectedMovie]); // Listen for changes in selectedMovie
+  }, [selectedMovie]);
 
   const handleBack = () => {
-    // If a movie is selected, go back to the movie list
     if (selectedMovie) {
       setSelectedMovie(null);
       setMovieDetails(null);
     } else {
-      // If no movie is selected, reload the activity
       Linking.reload();
     }
   };
-  
 
   const handleLoadMore = () => {
     if (!isFetchingMore) {
@@ -86,8 +82,20 @@ const MovieDetailsPage = ({ genre }) => {
         console.error('Error fetching movie details:', error);
       });
   };
-  
 
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const windowHeight = event.nativeEvent.layoutMeasurement.height;
+
+    if (offsetY === 0 && !isFetchingMore && year > 2012) {
+      setYear((prevYear) => prevYear - 1);
+      setPage(1);
+    } else if (offsetY + windowHeight >= contentHeight && !isFetchingMore && year < new Date().getFullYear()) {
+      setYear((prevYear) => prevYear + 1);
+      setPage(1);
+    }
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.movieContainer} onPress={() => handleSelectMovie(item)}>
@@ -96,7 +104,7 @@ const MovieDetailsPage = ({ genre }) => {
         style={styles.movieImage}
       />
       <Text style={[styles.movieTitle, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>{item.title}</Text>
-      <Text style={[styles.movieRating, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]}>Rating: {item.vote_average}</Text>
+      <Text style={[styles.movieRating, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]}>Rating: {item.vote_average.toFixed(1)}</Text>
     </TouchableOpacity>
   );
 
@@ -106,16 +114,17 @@ const MovieDetailsPage = ({ genre }) => {
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
       <View style={styles.imageCover}>
-      <Image
-        source={{ uri: `https://image.tmdb.org/t/p/original${selectedMovie.poster_path}` }}
-        style={styles.fullCoverImage}
-      /></View>
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/original${selectedMovie.poster_path}` }}
+          style={styles.fullCoverImage}
+        />
+      </View>
 
       <Text style={[styles.movieTitle, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
         {selectedMovie.title}
       </Text>
       <Text style={[styles.movieRating, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]}>
-        Rating: {selectedMovie.vote_average}
+      Rating: {item.vote_average.toFixed(1)}
       </Text>
       <Text style={styles.movieDetailsTitle}>{selectedMovie.title}</Text>
       <Text style={styles.movieDetailsOverview}>{selectedMovie.overview}</Text>
@@ -134,6 +143,12 @@ const MovieDetailsPage = ({ genre }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#121212' : '#f4f4f4' }]}>
+   <TouchableOpacity style={styles.yearButton} onPress={() => alert('Year button pressed')}>
+  <Text style={[styles.yearText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+    {year}
+  </Text>
+</TouchableOpacity>
+
       {loading && page === 1 ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : selectedMovie ? (
@@ -145,6 +160,7 @@ const MovieDetailsPage = ({ genre }) => {
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           contentContainerStyle={styles.content}
+          onScroll={handleScroll}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isFetchingMore ? <ActivityIndicator size="small" color="#0000ff" /> : null}
@@ -159,15 +175,29 @@ const styles = StyleSheet.create({
     flex: 100,
     padding: 20,
   },
-  imageCover:{
+  yearButton: {
+    backgroundColor: '#333', // Background color for the year button
+    borderRadius: 5,
+    alignItems: 'center', // Center the text vertically
+    justifyContent: 'center', // Center the text horizontally
+    width: '20%', // Occupy one-sixth of the screen width
+    marginVertical: 10, // Add some vertical margin
+    paddingVertical: 5, // Add some padding to the top and bottom
+  },
+  yearText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff', // Text color for the year button
+  },
+  imageCover: {
     width: '100%',
     height: 400,
-    padding:10,
+    padding: 10,
   },
   fullCoverImage: {
     width: '100%',
     height: '80%',
-    resizeMode: 'cover', // Ensure the image covers the entire container
+    resizeMode: 'cover',
   },
   content: {
     paddingBottom: 20,
