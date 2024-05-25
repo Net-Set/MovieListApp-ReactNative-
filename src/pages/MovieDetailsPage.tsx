@@ -23,6 +23,11 @@ const MovieDetailsPage = ({ genre }) => {
     if (page > 1) fetchMovies(year, page, genre);
   }, [page]);
 
+  useEffect(() => {
+    // Update year to 2012 whenever a new genre is selected
+    setYear(2012);
+  }, [genre]);
+
   const fetchMovies = (year, page, genre) => {
     setLoading(true);
     const endpoint =
@@ -124,7 +129,7 @@ const MovieDetailsPage = ({ genre }) => {
         {selectedMovie.title}
       </Text>
       <Text style={[styles.movieRating, { color: colorScheme === 'dark' ? '#dddddd' : '#666666' }]}>
-      Rating: {item.vote_average.toFixed(1)}
+      Rating: {selectedMovie.vote_average.toFixed(1)}
       </Text>
       <Text style={styles.movieDetailsTitle}>{selectedMovie.title}</Text>
       <Text style={styles.movieDetailsOverview}>{selectedMovie.overview}</Text>
@@ -140,7 +145,6 @@ const MovieDetailsPage = ({ genre }) => {
       )}
     </View>
   );
-
   return (
     <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#121212' : '#f4f4f4' }]}>
    <TouchableOpacity style={styles.yearButton} onPress={() => alert('Year button pressed')}>
@@ -176,12 +180,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   yearButton: {
-    backgroundColor: '#333', // Background color for the year button
+    
     borderRadius: 5,
     alignItems: 'center', // Center the text vertically
     justifyContent: 'center', // Center the text horizontally
     width: '20%', // Occupy one-sixth of the screen width
-    marginVertical: 10, // Add some vertical margin
+    marginVertical: 3, // Add some vertical margin
     paddingVertical: 5, // Add some padding to the top and bottom
   },
   yearText: {

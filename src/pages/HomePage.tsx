@@ -62,12 +62,16 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingHorizontal: 20,
+    backgroundColor: '#222',
+    marginLeft:5,
+    borderRadius:5,
   },
   tabText: {
     color: 'white',
+    padding: 10,
   },
   activeTab: {
-    backgroundColor: '#222',
+    backgroundColor: 'red',
     borderRadius: 5,
   },
   activeTabText: {
